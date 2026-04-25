@@ -1,7 +1,12 @@
 const db = require('./backend/db/database');
 try {
-    const res = db.prepare('SELECT 1 as result').get();
-    console.log('Test query result:', res);
+    db.get('SELECT 1 as result', (err, res) => {
+        if (err) {
+            console.error('Error:', err);
+        } else {
+            console.log('Test query result:', res);
+        }
+    });
 } catch (err) {
-    console.error('Error:', err);
+    console.error('Catch Error:', err);
 }
