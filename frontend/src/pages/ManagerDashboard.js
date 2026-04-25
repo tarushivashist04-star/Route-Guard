@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { LayoutDashboard, Users, AlertTriangle, Route, LogOut, Plus, Edit2, Trash2, Star, Eye, RefreshCw, Activity, MapPin, Clock, X, Shield, Truck, TrendingUp, Bell } from 'lucide-react';
+import { LayoutDashboard, Users, AlertTriangle, Route, LogOut, Plus, Edit2, Trash2, Star, Eye, RefreshCw, Activity, MapPin, Clock, X, Truck, TrendingUp, Bell } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getDrivers, createDriver, updateDriver, deleteDriver, getDashboardStats, getIssues, getAllRoutes } from '../api/client';
 import toast from 'react-hot-toast';

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Home, Map as MapIcon, AlertTriangle, User, Truck, Navigation, Star, Bell, LogOut, Check, X, MapPin, Clock, RefreshCw, CheckCircle, XCircle, BrainCircuit } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Home, Map as MapIcon, AlertTriangle, User, Truck, Navigation, Bell, LogOut, Check, X, MapPin, Clock, RefreshCw, CheckCircle, XCircle, BrainCircuit } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getMyStats, getCurrentRoute, getMyAlerts, getMyRoutes, reportIssue, setRoute, completeRoute, updateLocation, markAlertSeen, verifyIssue, falseReport } from '../api/client';
 import toast from 'react-hot-toast';
@@ -179,7 +179,7 @@ function SetRouteModal({ onClose, onSet }) {
         setForm(f=>({...f, route_name: 'NH48 Direct Express', distance_km: '150'}));
       }, 1000);
     }
-  }, [form.start_point, form.end_point]);
+  }, [form.start_point, form.end_point, form.route_name]);
 
   const submit = async e => {
     e.preventDefault(); setLoading(true);
@@ -236,7 +236,6 @@ export default function DriverDashboard() {
   const [tab, setTab] = useState('home');
   const [driverData, setDriverData] = useState(null);
   const [currentRoute, setCurrentRoute] = useState(null);
-  const [alternateRoutes, setAlternateRoutes] = useState([]);
   const [alerts, setAlerts] = useState([]);
   const [routeHistory, setRouteHistory] = useState([]);
   const [myIssues, setMyIssues] = useState([]);
@@ -258,7 +257,7 @@ export default function DriverDashboard() {
     try {
       const [sr, rr, ar] = await Promise.all([getMyStats(), getCurrentRoute(), getMyAlerts()]);
       setDriverData(sr.data.driver); setUnreadCount(sr.data.unreadAlerts);
-      setCurrentRoute(rr.data.activeRoute); setAlternateRoutes(rr.data.alternateRoutes||[]);
+      setCurrentRoute(rr.data.activeRoute);
       setAlerts(ar.data); setMyIssues(sr.data.myIssues||[]);
     } catch { toast.error('Failed to load data'); }
     finally { setLoading(false); }
