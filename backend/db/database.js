@@ -1,16 +1,23 @@
-const Database = require('better-sqlite3');
+const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
 
 const dbDir = path.join(__dirname, '../data');
 if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir, { recursive: true });
 
-const db = new Database(path.join(dbDir, 'routeguard.db'));
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
+const db = new sqlite3.Database(path.join(dbDir, 'routeguard.db'), (err) => {
+  if (err) {
+    console.error('DB Error:', err);
+  } else {
+    console.log('Connected to SQLite');
+  }
+});
 
-function initializeDatabase() {
-  db.exec(`
+db.serialize(() => {
+  db.run('PRAGMA journal_mode = WAL');
+  db.run('PRAGMA foreign_keys = ON');
+
+  db.run(`
     CREATE TABLE IF NOT EXISTS managers (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
@@ -20,7 +27,7 @@ function initializeDatabase() {
     )
   `);
 
-  db.exec(`
+  db.run(`
     CREATE TABLE IF NOT EXISTS drivers (
       id TEXT PRIMARY KEY,
       driver_id TEXT UNIQUE NOT NULL,
@@ -42,7 +49,7 @@ function initializeDatabase() {
     )
   `);
 
-  db.exec(`
+  db.run(`
     CREATE TABLE IF NOT EXISTS issues (
       id TEXT PRIMARY KEY,
       driver_id TEXT NOT NULL,
@@ -60,7 +67,7 @@ function initializeDatabase() {
     )
   `);
 
-  db.exec(`
+  db.run(`
     CREATE TABLE IF NOT EXISTS route_history (
       id TEXT PRIMARY KEY,
       driver_id TEXT NOT NULL,
@@ -77,7 +84,7 @@ function initializeDatabase() {
     )
   `);
 
-  db.exec(`
+  db.run(`
     CREATE TABLE IF NOT EXISTS alerts (
       id TEXT PRIMARY KEY,
       issue_id TEXT NOT NULL,
@@ -91,7 +98,7 @@ function initializeDatabase() {
     )
   `);
 
-  db.exec(`
+  db.run(`
     CREATE TABLE IF NOT EXISTS point_transactions (
       id TEXT PRIMARY KEY,
       driver_id TEXT NOT NULL,
@@ -100,10 +107,9 @@ function initializeDatabase() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (driver_id) REFERENCES drivers(driver_id)
     )
-  `);
+  `, () => {
+    console.log('✅ Database initialized');
+  });
+});
 
-  console.log('✅ Database initialized');
-}
-
-initializeDatabase();
 module.exports = db;
